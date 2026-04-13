@@ -11,7 +11,8 @@ load_dotenv()
 
 client = EPTR2(
     username=os.getenv("EPTR_USERNAME"),
-    password=os.getenv("EPTR_PASSWORD")
+    password=os.getenv("EPTR_PASSWORD"),
+    timeout=60
 )
 
 def get_snowflake_conn():
