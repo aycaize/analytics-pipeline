@@ -120,23 +120,29 @@ Snowflake Layers
 | daily_ingestion | Daily 09:00 TR | Incremental EPIAS data load |
 | monthly_ingestion | 5th of month 09:00 TR | Full CPI data refresh |
 
-## How to Run
+## How It Works
 
-**Ingestion:**
+**Daily Ingestion (Automated)**
+GitHub Actions runs `fetch_prices_incremental.py` every day at 09:00 TR time. 
+The script checks the last loaded date in Snowflake and fetches only new data from EPIAS API.
+
+**Monthly CPI Ingestion (Automated)**
+GitHub Actions runs `fetch_cpi.py` on the 5th of each month.
+Full refresh of CPI data from TCMB EVDS API.
+
+**dbt Transformations**
+After ingestion, dbt models transform raw data through staging → intermediate → marts layers.
+46 data quality tests run across all models.
+
+**Local Setup (requires Snowflake + EPIAS + EVDS credentials)**
 ```bash
+git clone https://github.com/aycaize/analytics-pipeline.git
+cd analytics-pipeline
 python -m venv venv
 venv\Scripts\activate
 pip install -r requirements.txt
-python fetch_prices_incremental.py   # incremental
-python fetch_prices_full.py          # full refresh
-python fetch_cpi.py                  # CPI data
-```
 
-**dbt transformations:**
-```bash
-cd dbt-repository
-pip install dbt-snowflake==1.7.0
-dbt debug
-dbt run
-dbt test
+# Create .env file with your credentials
+# Run ingestion
+python fetch_prices_incremental.py
 ```
